@@ -2,6 +2,9 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
 const Home = () => {
+  useEffect(() => {
+    document.title = 'Home • StayFinder';
+  }, []);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
 

@@ -1,6 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const Signup = () => {
+  useEffect(() => {
+      document.title = 'Signup • StayFinder';
+    }, []);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -8,7 +14,8 @@ const Signup = () => {
     password: '',
     confirmPassword: '',
     agreeToTerms: false,
-    subscribeNewsletter: true
+    subscribeNewsletter: true,
+    role: 'guest'
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -18,6 +25,20 @@ const Signup = () => {
   const [apiError, setApiError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
+  // Extract eye icon SVG paths to constants
+  const EYE_OPEN_PATH = "M15 12a3 3 0 11-6 0 3 3 0 016 0z";
+  const EYE_CLOSED_PATH = "M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L7.05 7.05M9.878 9.878a3 3 0 00-.007 4.243M7.05 7.05L4.222 4.222M7.05 7.05a10.003 10.003 0 019.9 12.825M7.05 7.05L10.293 10.293";
+
+  // Reusable function to clear specific field errors
+  const clearFieldError = (fieldName) => {
+    if (errors[fieldName]) {
+      setErrors(prev => ({
+        ...prev,
+        [fieldName]: ''
+      }));
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -26,12 +47,7 @@ const Signup = () => {
     }));
 
     // Clear specific field error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
+    clearFieldError(name);
 
     // Calculate password strength
     if (name === 'password') {
@@ -128,7 +144,8 @@ const Signup = () => {
       const registrationData = {
         name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
         email: formData.email.trim().toLowerCase(),
-        password: formData.password
+        password: formData.password,
+        role: formData.role
       };
 
       // Make API call to backend
@@ -147,22 +164,9 @@ const Signup = () => {
         // Registration successful
         setSuccessMessage('Account created successfully! Welcome to StayFinder!');
         
-        // Optional: Clear form
-        setFormData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          password: '',
-          confirmPassword: '',
-          agreeToTerms: false,
-          subscribeNewsletter: true
-        });
-        setPasswordStrength(0);
-
-        // Optional: Redirect to login or dashboard after delay
+        // Single redirect with timeout
         setTimeout(() => {
-          console.log('Redirecting to login or dashboard...');
-          // window.location.href = '/login'; // or use router navigation
+          navigate('/hostdashboard');
         }, 2000);
 
       } else {
@@ -187,6 +191,24 @@ const Signup = () => {
       alert(`OAuth login with ${provider} - This would redirect to ${provider} authentication`);
     }
   };
+
+  // Reusable password toggle button component
+  const PasswordToggleButton = ({ isVisible, onToggle }) => (
+    <button
+      type="button"
+      onClick={onToggle}
+      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+    >
+      <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          strokeWidth={2} 
+          d={isVisible ? EYE_CLOSED_PATH : EYE_OPEN_PATH} 
+        />
+      </svg>
+    </button>
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-pink-50 flex items-center justify-center px-4 py-12">
@@ -247,28 +269,6 @@ const Signup = () => {
               </svg>
               <span className="text-gray-700 font-medium">Continue with Google</span>
             </button>
-
-            <button
-              onClick={() => handleOAuthLogin('facebook')}
-              disabled={isLoading}
-              className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <svg className="w-5 h-5 mr-3" fill="#1877F2" viewBox="0 0 24 24">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-              </svg>
-              <span className="text-gray-700 font-medium">Continue with Facebook</span>
-            </button>
-
-            <button
-              onClick={() => handleOAuthLogin('apple')}
-              disabled={isLoading}
-              className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <svg className="w-5 h-5 mr-3" fill="#000" viewBox="0 0 24 24">
-                <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/>
-              </svg>
-              <span className="text-gray-700 font-medium">Continue with Apple</span>
-            </button>
           </div>
 
           {/* Divider */}
@@ -282,7 +282,38 @@ const Signup = () => {
           </div>
 
           {/* Registration Form */}
-          <div className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* User Role */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Sign up as
+              </label>
+              <div className="flex space-x-6">
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="guest"
+                    checked={formData.role === 'guest'}
+                    onChange={handleChange}
+                    className="form-radio text-red-600"
+                  />
+                  <span className="ml-2 text-gray-700">Guest</span>
+                </label>
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="host"
+                    checked={formData.role === 'host'}
+                    onChange={handleChange}
+                    className="form-radio text-red-600"
+                  />
+                  <span className="ml-2 text-gray-700">Host</span>
+                </label>
+              </div>
+            </div>
+
             {/* Name Fields */}
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -363,19 +394,10 @@ const Signup = () => {
                   }`}
                   placeholder="Create a strong password"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                >
-                  <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    {showPassword ? (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L7.05 7.05M9.878 9.878a3 3 0 00-.007 4.243M7.05 7.05L4.222 4.222M7.05 7.05a10.003 10.003 0 019.9 12.825M7.05 7.05L10.293 10.293" />
-                    ) : (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    )}
-                  </svg>
-                </button>
+                <PasswordToggleButton 
+                  isVisible={showPassword} 
+                  onToggle={() => setShowPassword(!showPassword)} 
+                />
               </div>
               {errors.password && (
                 <p className="mt-1 text-xs text-red-600">{errors.password}</p>
@@ -417,19 +439,10 @@ const Signup = () => {
                   }`}
                   placeholder="Confirm your password"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                >
-                  <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    {showConfirmPassword ? (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L7.05 7.05M9.878 9.878a3 3 0 00-.007 4.243M7.05 7.05L4.222 4.222M7.05 7.05a10.003 10.003 0 019.9 12.825M7.05 7.05L10.293 10.293" />
-                    ) : (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    )}
-                  </svg>
-                </button>
+                <PasswordToggleButton 
+                  isVisible={showConfirmPassword} 
+                  onToggle={() => setShowConfirmPassword(!showConfirmPassword)} 
+                />
               </div>
               {errors.confirmPassword && (
                 <p className="mt-1 text-xs text-red-600">{errors.confirmPassword}</p>
@@ -499,7 +512,7 @@ const Signup = () => {
                 'Create Account'
               )}
             </button>
-          </div>
+          </form>
 
           {/* Login Link */}
           <div className="mt-6 text-center">
