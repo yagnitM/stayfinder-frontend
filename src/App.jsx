@@ -11,6 +11,8 @@ import Privacy from './pages/common/Privacy.jsx';
 import Terms from './pages/common/Terms.jsx';
 import HostDashboard from './pages/host/HostDashboard.jsx';
 import GuestDashboard from './pages/guest/GuestDashboard.jsx';
+import Contact from './pages/common/Contact.jsx';
+import FAQ from './pages/common/FAQ.jsx';
 
 function App() {
   return (
@@ -30,6 +32,9 @@ function App() {
             <Route path="/terms" element = {<Terms />} />
             <Route path="/hostdashboard" element = {<HostDashboard />} />
             <Route path="/guestdashboard" element = {<GuestDashboard />} />
+            <Route path="/contact" element = {<Contact />} />
+            <Route path="/faq" element = {<FAQ />} />
+            {/* Add more routes as needed */}
           </Routes>
         </main>
         <Footer />
