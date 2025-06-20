@@ -2,14 +2,15 @@ import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
-import Home from './pages/Home.jsx';
-import Login from './pages/Login.jsx';
-import Signup from './pages/Signup.jsx';
-import Listing from './pages/Listing.jsx';
-import About from './pages/About.jsx';
-import Privacy from './pages/Privacy.jsx';
-import Terms from './pages/Terms.jsx';
-import HostDashboard from './pages/HostDashboard.jsx';
+import Home from './pages/common/Home.jsx';
+import Login from './pages/auth/Login.jsx';
+import Signup from './pages/auth/Signup.jsx';
+import Listing from './pages/common/Listing.jsx';
+import About from './pages/common/About.jsx';
+import Privacy from './pages/common/Privacy.jsx';
+import Terms from './pages/common/Terms.jsx';
+import HostDashboard from './pages/host/HostDashboard.jsx';
+import GuestDashboard from './pages/guest/GuestDashboard.jsx';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
             <Route path="/privacy" element = {<Privacy />} />
             <Route path="/terms" element = {<Terms />} />
             <Route path="/hostdashboard" element = {<HostDashboard />} />
+            <Route path="/guestdashboard" element = {<GuestDashboard />} />
           </Routes>
         </main>
         <Footer />
