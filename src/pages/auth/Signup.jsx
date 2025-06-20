@@ -149,7 +149,7 @@ const Signup = () => {
       };
 
       // Make API call to backend
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch('https://stayfinder-backend-ri8p.onrender.com/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -186,7 +186,7 @@ const Signup = () => {
     console.log(`OAuth login with ${provider}`);
     // For Google OAuth, redirect to backend OAuth route
     if (provider === 'google') {
-      window.location.href = 'http://localhost:5000/api/auth/google';
+      window.location.href = 'https://stayfinder-backend-ri8p.onrender.com//api/auth/google';
     } else {
       alert(`OAuth login with ${provider} - This would redirect to ${provider} authentication`);
     }
