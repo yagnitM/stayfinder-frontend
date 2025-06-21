@@ -14,29 +14,51 @@ const Navbar = () => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
 
-    setIsLoggedIn(!!token);
+    console.log('=== Auth Check ===');
+    console.log('Token exists:', !!token);
+    console.log('Raw userData:', userData);
+
+    // If no token, clear everything
+    if (!token) {
+      setIsLoggedIn(false);
+      setUserType(null);
+      return;
+    }
+
+    setIsLoggedIn(true);
 
     // Fix: Add additional checks for userData
-    if (userData && userData !== 'undefined' && userData !== 'null') {
+    if (userData && userData !== 'undefined' && userData !== 'null' && userData.trim() !== '') {
       try {
         const user = JSON.parse(userData);
-        console.log('Parsed user:', user); // Debug log
-        if (user && (user.role === 'host' || user.role === 'user')) {
+        console.log('Parsed user:', user);
+        
+        if (user && user.role && (user.role === 'host' || user.role === 'user')) {
           console.log('Setting user type:', user.role);
           setUserType(user.role);
         } else {
           console.log('Invalid user role or user object:', user);
+          // If we have a token but invalid user data, clear everything
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setIsLoggedIn(false);
           setUserType(null);
         }
       } catch (err) {
         console.error('Error parsing user from localStorage:', err);
         console.log('Raw userData:', userData);
         // Clear invalid data
+        localStorage.removeItem('token');
         localStorage.removeItem('user');
+        setIsLoggedIn(false);
         setUserType(null);
       }
     } else {
-      console.log('No valid user data found in localStorage');
+      console.log('No valid user data found - clearing token');
+      // If we have a token but no valid user data, something is wrong
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setIsLoggedIn(false);
       setUserType(null);
     }
   }, [location.pathname]); // runs on mount and route change
