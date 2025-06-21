@@ -32,9 +32,7 @@
       setError('');
       
       try {
-        // Use relative path - proxy will handle routing to backend
-        
-        const response = await fetch('/api/auth/login', {
+        const response = await fetch('https://stayfinde r-backend-ri8p.onrender.com/api/auth/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -87,7 +85,7 @@
 
     const handleGoogleSignIn = () => {
       // Use relative path for Google OAuth
-      window.location.href = '/api/auth/google';
+      window.location.href = 'https://stayfinder-backend-ri8p.onrender.com/api/auth/google';
     };
 
     return (
