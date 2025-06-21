@@ -9,7 +9,7 @@ const Listing = ({ id, title, location, pricePerNight, originalPrice, imageUrl, 
   const handleFavoriteClick = (e) => {
     e.stopPropagation();
     setIsFavorited(!isFavorited);
-    onFavoriteClick(!isFavorited);
+    onFavoriteClick && onFavoriteClick(!isFavorited);
   };
 
   return (
@@ -22,7 +22,7 @@ const Listing = ({ id, title, location, pricePerNight, originalPrice, imageUrl, 
           {tag && <span className={`${tagColors[tag]} text-white text-xs font-semibold px-2 py-1 rounded-full`}>{tag}</span>}
           <div className="flex gap-2">
             {!isMapView && (
-              <button onClick={(e) => { e.stopPropagation(); onViewOnMap(id); }} className="bg-white/90 rounded-full p-1.5 shadow hover:bg-white transition-colors">
+              <button onClick={(e) => { e.stopPropagation(); onViewOnMap && onViewOnMap(id); }} className="bg-white/90 rounded-full p-1.5 shadow hover:bg-white transition-colors">
                 <MapPin size={14} className="text-gray-600" />
               </button>
             )}
@@ -46,7 +46,7 @@ const Listing = ({ id, title, location, pricePerNight, originalPrice, imageUrl, 
           </div>
         </div>
         <div className="flex items-center gap-3 text-xs">
-          {amenities.slice(0, 2).map((amenity, i) => (
+          {amenities && amenities.slice(0, 2).map((amenity, i) => (
             <div key={i} className="flex items-center gap-1 text-gray-600">
               {amenityIcons[amenity]}
               <span className="capitalize">{amenity}</span>
@@ -71,7 +71,7 @@ const Listing = ({ id, title, location, pricePerNight, originalPrice, imageUrl, 
           </div>
         </div>
         <button
-          onClick={(e) => { e.stopPropagation(); onBookClick(); }}
+          onClick={(e) => { e.stopPropagation(); onBookClick && onBookClick(); }}
           disabled={!availability}
           className={`w-full py-2 px-4 rounded-lg font-semibold text-sm transition-all ${
             availability ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'
@@ -155,7 +155,7 @@ const LeafletMap = ({ listings, selectedListing, onMarkerClick, onClose }) => {
           })
         });
 
-        marker.on('click', () => onMarkerClick(listing));
+        marker.on('click', () => onMarkerClick && onMarkerClick(listing));
         marker.addTo(mapInstanceRef.current);
         markersRef.current.push(marker);
       });
@@ -168,34 +168,7 @@ const LeafletMap = ({ listings, selectedListing, onMarkerClick, onClose }) => {
         mapInstanceRef.current = null;
       }
     };
-  }, [listings]);
-
-  useEffect(() => {
-    if (mapInstanceRef.current) {
-      markersRef.current.forEach(marker => mapInstanceRef.current.removeLayer(marker));
-      markersRef.current = [];
-
-      listings.forEach((listing, index) => {
-        const coords = getCoordinates(listing.location, index);
-        const isSelected = selectedListing?.id === listing.id;
-        
-        const markerHtml = `<div style="background: ${isSelected ? '#dc2626' : '#2563eb'}; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border: 2px solid white; min-width: 60px; text-align: center;">₹${listing.pricePerNight.toLocaleString()}</div>`;
-
-        const marker = window.L.marker(coords, {
-          icon: window.L.divIcon({
-            className: 'custom-marker',
-            html: markerHtml,
-            iconSize: [60, 30],
-            iconAnchor: [30, 30]
-          })
-        });
-
-        marker.on('click', () => onMarkerClick(listing));
-        marker.addTo(mapInstanceRef.current);
-        markersRef.current.push(marker);
-      });
-    }
-  }, [selectedListing]);
+  }, [listings, selectedListing, onMarkerClick]);
 
   return (
     <div className="relative h-full rounded-lg overflow-hidden">
@@ -303,6 +276,7 @@ const EnhancedListingApp = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedMapListing, setSelectedMapListing] = useState(null);
 
+  // Set document title only once at the app level
   useEffect(() => {
     document.title = 'Listings • StayFinder';
   }, []);
