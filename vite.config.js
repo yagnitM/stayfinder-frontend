@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        // target: 'http://localhost:5000', //dev
+        //target: 'http://localhost:5000', //dev
         target: 'https://stayfinder-backend-ri8p.onrender.com',
         changeOrigin: true,
         secure: false
