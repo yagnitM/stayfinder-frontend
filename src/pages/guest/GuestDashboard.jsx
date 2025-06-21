@@ -15,7 +15,7 @@ const GuestDashboard = () => {
           return;
         }
 
-        const res = await axios.get('/api/dashboard/guest-summary', {
+        const res = await axios.get('https://stayfinder-backend-ri8p.onrender.com/api/dashboard/host-summary', {
           headers: {
             Authorization: `Bearer ${token}`
           }
