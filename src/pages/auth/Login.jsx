@@ -32,7 +32,7 @@
       setError('');
       
       try {
-        const response = await fetch('https://stayfinde r-backend-ri8p.onrender.com/api/auth/login', {
+        const response = await fetch('https://stayfinder-backend-ri8p.onrender.com/api/auth/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
