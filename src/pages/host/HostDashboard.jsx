@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useEffect } from 'react';
 
 const HostDashboard = () => {
   useEffect(() => {
