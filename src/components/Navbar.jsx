@@ -20,6 +20,7 @@ const Navbar = () => {
       try {
         const user = JSON.parse(userData);
         if (user.role === 'host' || user.role === 'user') {
+          console.log(user.role);
           setUserType(user.role);
         } else {
           setUserType(null);
