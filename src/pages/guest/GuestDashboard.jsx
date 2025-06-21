@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useEffect } from 'react';
 
 const GuestDashboard = () => {
+  useEffect(() => {
+    document.title = 'Dashboard • StayFinder';
+  }, []);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

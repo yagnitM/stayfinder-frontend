@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Search, HelpCircle, Users, CreditCard, Home, Shield, Star } from 'lucide-react';
+import { useEffect } from 'react';
 
 const FAQ = () => {
+  useEffect(() => {
+    document.title = 'FAQ • StayFinder';
+  }, []);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [openItems, setOpenItems] = useState({});

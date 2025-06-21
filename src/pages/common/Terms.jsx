@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { FileText, Users, Home, UserX, RefreshCw, AlertTriangle, CheckCircle, Calendar, Scale, Shield, Mail, Phone } from 'lucide-react';
+import { useEffect } from 'react';
 
 const Terms = () => {
+  useEffect(() => {
+    document.title = 'Terms • StayFinder';
+  }, []);
   const [expandedSections, setExpandedSections] = useState({});
 
   const toggleSection = (sectionId) => {

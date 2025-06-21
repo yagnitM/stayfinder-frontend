@@ -13,6 +13,8 @@ import HostDashboard from './pages/host/HostDashboard.jsx';
 import GuestDashboard from './pages/guest/GuestDashboard.jsx';
 import Contact from './pages/common/Contact.jsx';
 import FAQ from './pages/common/FAQ.jsx';
+import Messages from './pages/common/Messages.jsx';
+import Bookings from './pages/common/Bookings.jsx';
 
 function App() {
   return (
@@ -34,6 +36,8 @@ function App() {
             <Route path="/guestdashboard" element = {<GuestDashboard />} />
             <Route path="/contact" element = {<Contact />} />
             <Route path="/faq" element = {<FAQ />} />
+            <Route path="/messages" element={<Messages />} />
+            <Route path="/bookings" element={<Bookings />} />
             {/* Add more routes as needed */}
           </Routes>
         </main>

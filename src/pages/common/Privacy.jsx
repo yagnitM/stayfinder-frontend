@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { Shield, Eye, Users, Cookie, Lock, User, ChevronDown, ChevronRight, Calendar, Mail, Phone } from 'lucide-react';
+import { useEffect } from 'react';
 
 const Privacy = () => {
+  useEffect(() => {
+    document.title = 'Privacy • StayFinder';
+  }, []);
   const [expandedSections, setExpandedSections] = useState({});
 
   const toggleSection = (sectionId) => {

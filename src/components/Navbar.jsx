@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userType, setUserType] = useState(null); // 'guest' or 'host'
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -11,21 +12,41 @@ const Navbar = () => {
   useEffect(() => {
     const checkAuthStatus = () => {
       const token = localStorage.getItem('token');
+      const userData = localStorage.getItem('user');
       setIsLoggedIn(!!token);
+      
+      if (userData) {
+        try {
+          const user = JSON.parse(userData);
+          setUserType(user.role); // 'host' or 'user'
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+          setUserType(null);
+        }
+      } else {
+        setUserType(null);
+      }
     };
 
     checkAuthStatus();
     
     // Redirect away from auth pages if already logged in
     if (isLoggedIn && (location.pathname === '/login' || location.pathname === '/register')) {
-      navigate('/dashboard');
+      // Redirect based on user type
+      if (userType === 'host') {
+        navigate('/hostdashboard');
+      } else if (userType === 'user') {
+        navigate('/guestdashboard');
+      }
     }
-  }, [location.pathname, isLoggedIn, navigate]);
+  }, [location.pathname, isLoggedIn, userType, navigate]);
 
   // Handle logout
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user'); // Remove user data
     setIsLoggedIn(false);
+    setUserType(null);
     setIsMenuOpen(false);
     navigate('/');
   };
@@ -38,17 +59,32 @@ const Navbar = () => {
     { path: '/faq', label: 'FAQ', description: 'Frequently asked questions' }
   ];
 
-  // Navigation items for authenticated users
-  const userNavItems = [
-    { path: '/dashboard', label: 'Dashboard', description: 'Your account overview' },
+  // Navigation items for guest users (role: 'user')
+  const userGuestNavItems = [
+    { path: '/guestdashboard', label: 'Dashboard', description: 'Your guest dashboard' },
     { path: '/bookings', label: 'My Bookings', description: 'View your reservations' },
     { path: '/listings', label: 'Listings', description: 'Browse & book accommodations' },
-    { path: '/my-listings', label: 'My Listings', description: 'Manage your properties' },
     { path: '/messages', label: 'Messages', description: 'View conversations' },
     { path: '/about', label: 'About', description: 'Learn about StayFinder' }
   ];
 
-  const currentNavItems = isLoggedIn ? userNavItems : guestNavItems;
+  // Navigation items for host users (role: 'host')
+  const userHostNavItems = [
+    { path: '/hostdashboard', label: 'Dashboard', description: 'Your host dashboard' },
+    { path: '/my-listings', label: 'My Listings', description: 'Manage your properties' },
+    { path: '/bookings', label: 'Bookings', description: 'Manage reservations' },
+    { path: '/listings', label: 'All Listings', description: 'Browse accommodations' },
+    { path: '/messages', label: 'Messages', description: 'View conversations' },
+    { path: '/about', label: 'About', description: 'Learn about StayFinder' }
+  ];
+
+  // Determine which navigation items to show
+  const getCurrentNavItems = () => {
+    if (!isLoggedIn) return guestNavItems;
+    return userType === 'host' ? userHostNavItems : userGuestNavItems;
+  };
+
+  const currentNavItems = getCurrentNavItems();
 
   return (
     <nav className="bg-white shadow-lg border-b border-gray-100 sticky top-0 z-50">
@@ -100,6 +136,10 @@ const Navbar = () => {
                 </>
               ) : (
                 <div className="flex items-center space-x-3">
+                  {/* Show user type indicator */}
+                  <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded-md">
+                    {userType === 'host' ? '🏠 Host' : '👤 Guest'}
+                  </span>
                   <Link
                     to="/settings"
                     className="text-gray-700 hover:text-red-600 font-medium px-3 py-2 rounded-lg hover:bg-gray-50 transition-all duration-200"
@@ -176,6 +216,9 @@ const Navbar = () => {
                   </>
                 ) : (
                   <>
+                    <div className="px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-md mb-2">
+                      {userType === 'host' ? '🏠 Host Account' : '👤 Guest Account'}
+                    </div>
                     <Link
                       to="/settings"
                       className="block px-3 py-3 text-gray-700 hover:text-red-600 hover:bg-gray-50 rounded-md font-medium transition-all duration-200"

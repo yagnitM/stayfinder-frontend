@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send, MessageCircle, Clock, Users } from 'lucide-react';
+import { useEffect } from 'react';
 
 const Contact = () => {
+  useEffect(() => {
+    document.title = 'Contact Us • StayFinder';
+  }, []);
   const [formData, setFormData] = useState({
     name: '',
     email: '',

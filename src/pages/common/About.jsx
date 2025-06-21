@@ -35,7 +35,7 @@ const About = () => {
       bio: 'Award-winning designer focused on creating intuitive and beautiful user experiences.'
     },
     {
-      name: 'David Kumar',
+      name: 'David Miller',
       role: 'Head of Operations',
       image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face',
       bio: 'Operations expert ensuring smooth experiences for hosts and guests worldwide.'
