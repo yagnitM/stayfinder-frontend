@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Heart, MapPin, Star, Wifi, Car, Coffee, Users, Search, X, List, ChevronDown, Sliders } from 'lucide-react';
-import { useEffect } from 'react';
 
 const Listing = ({ id, title, location, pricePerNight, originalPrice, imageUrl, rating, reviewCount, tag, maxGuests, amenities, availability = true, propertyType, onFavoriteClick, onBookClick, onViewOnMap, isMapView = false }) => {
   useEffect(() => {
