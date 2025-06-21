@@ -3,8 +3,8 @@ import { Heart, MapPin, Star, Wifi, Car, Coffee, Users, Search, X, List, Chevron
 
 const Listing = ({ id, title, location, pricePerNight, originalPrice, imageUrl, rating, reviewCount, tag, maxGuests, amenities, availability = true, propertyType, onFavoriteClick, onBookClick, onViewOnMap, isMapView = false }) => {
   useEffect(() => {
-    document.title = 'Listings • StayFinder';
-  }, []);
+      document.title = 'Listings • StayFinder';
+    }, []);
   const [isFavorited, setIsFavorited] = useState(false);
   const amenityIcons = { wifi: <Wifi size={14} />, parking: <Car size={14} />, breakfast: <Coffee size={14} /> };
   const tagColors = { 'Featured': 'bg-blue-600', 'New': 'bg-green-600', 'Popular': 'bg-purple-600', 'Discounted': 'bg-red-600' };
