@@ -16,33 +16,45 @@ const Navbar = () => {
 
     setIsLoggedIn(!!token);
 
-    if (userData) {
+    // Fix: Add additional checks for userData
+    if (userData && userData !== 'undefined' && userData !== 'null') {
       try {
         const user = JSON.parse(userData);
-        if (user.role === 'host' || user.role === 'user') {
-          console.log(user.role);
+        console.log('Parsed user:', user); // Debug log
+        if (user && (user.role === 'host' || user.role === 'user')) {
+          console.log('Setting user type:', user.role);
           setUserType(user.role);
         } else {
+          console.log('Invalid user role or user object:', user);
           setUserType(null);
         }
       } catch (err) {
         console.error('Error parsing user from localStorage:', err);
+        console.log('Raw userData:', userData);
+        // Clear invalid data
+        localStorage.removeItem('user');
         setUserType(null);
       }
     } else {
+      console.log('No valid user data found in localStorage');
       setUserType(null);
     }
   }, [location.pathname]); // runs on mount and route change
 
   // Step 2: Handle redirect if already logged in
   useEffect(() => {
+    console.log('Redirect effect - isLoggedIn:', isLoggedIn, 'userType:', userType, 'path:', location.pathname);
+    
     if (
       isLoggedIn &&
+      userType && // Make sure userType is not null
       (location.pathname === '/login' || location.pathname === '/register')
     ) {
       if (userType === 'host') {
+        console.log('Redirecting to host dashboard');
         navigate('/hostdashboard');
       } else if (userType === 'user') {
+        console.log('Redirecting to guest dashboard');
         navigate('/guestdashboard');
       }
     }
