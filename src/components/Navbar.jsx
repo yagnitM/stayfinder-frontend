@@ -4,54 +4,60 @@ import { useState, useEffect } from 'react';
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userType, setUserType] = useState(null); // 'guest' or 'host'
+  const [userType, setUserType] = useState(null); // 'user' or 'host'
+
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Check authentication status on component mount and route changes
+  // Step 1: Check auth and extract role from user.role
   useEffect(() => {
-    const checkAuthStatus = () => {
-      const token = localStorage.getItem('token');
-      const userData = localStorage.getItem('user');
-      setIsLoggedIn(!!token);
-      
-      if (userData) {
-        try {
-          const user = JSON.parse(userData);
-          setUserType(user.role); // 'host' or 'user'
-        } catch (error) {
-          console.error('Error parsing user data:', error);
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+
+    setIsLoggedIn(!!token);
+
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        if (user.role === 'host' || user.role === 'user') {
+          setUserType(user.role);
+        } else {
           setUserType(null);
         }
-      } else {
+      } catch (err) {
+        console.error('Error parsing user from localStorage:', err);
         setUserType(null);
       }
-    };
+    } else {
+      setUserType(null);
+    }
+  }, [location.pathname]); // runs on mount and route change
 
-    checkAuthStatus();
-    
-    // Redirect away from auth pages if already logged in
-    if (isLoggedIn && (location.pathname === '/login' || location.pathname === '/register')) {
-      // Redirect based on user type
+  // Step 2: Handle redirect if already logged in
+  useEffect(() => {
+    if (
+      isLoggedIn &&
+      (location.pathname === '/login' || location.pathname === '/register')
+    ) {
       if (userType === 'host') {
         navigate('/hostdashboard');
       } else if (userType === 'user') {
         navigate('/guestdashboard');
       }
     }
-  }, [location.pathname, isLoggedIn, userType, navigate]);
+  }, [isLoggedIn, userType, location.pathname, navigate]);
 
-  // Handle logout
+  // Logout
   const handleLogout = () => {
     localStorage.removeItem('token');
-    localStorage.removeItem('user'); // Remove user data
+    localStorage.removeItem('user');
     setIsLoggedIn(false);
     setUserType(null);
     setIsMenuOpen(false);
     navigate('/');
   };
 
-  // Navigation items for non-authenticated users
+  // Nav items
   const guestNavItems = [
     { path: '/listings', label: 'Listings', description: 'Browse accommodations' },
     { path: '/about', label: 'About', description: 'Learn about StayFinder' },
@@ -59,7 +65,6 @@ const Navbar = () => {
     { path: '/faq', label: 'FAQ', description: 'Frequently asked questions' }
   ];
 
-  // Navigation items for guest users (role: 'user')
   const userGuestNavItems = [
     { path: '/guestdashboard', label: 'Dashboard', description: 'Your guest dashboard' },
     { path: '/bookings', label: 'My Bookings', description: 'View your reservations' },
@@ -68,7 +73,6 @@ const Navbar = () => {
     { path: '/about', label: 'About', description: 'Learn about StayFinder' }
   ];
 
-  // Navigation items for host users (role: 'host')
   const userHostNavItems = [
     { path: '/hostdashboard', label: 'Dashboard', description: 'Your host dashboard' },
     { path: '/my-listings', label: 'My Listings', description: 'Manage your properties' },
@@ -78,7 +82,6 @@ const Navbar = () => {
     { path: '/about', label: 'About', description: 'Learn about StayFinder' }
   ];
 
-  // Determine which navigation items to show
   const getCurrentNavItems = () => {
     if (!isLoggedIn) return guestNavItems;
     return userType === 'host' ? userHostNavItems : userGuestNavItems;
@@ -100,70 +103,49 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Nav */}
           <div className="hidden md:flex items-center space-x-6">
-            {/* Navigation Links */}
-            <div className="flex items-center space-x-6">
-              {currentNavItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className="text-gray-700 hover:text-red-600 font-medium transition-colors duration-200 relative group px-2 py-1"
-                  title={item.description}
-                >
-                  {item.label}
-                  <span className="absolute -bottom-1 left-2 w-0 h-0.5 bg-red-600 group-hover:w-[calc(100%-1rem)] transition-all duration-200"></span>
-                </Link>
-              ))}
-            </div>
+            {currentNavItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                title={item.description}
+                className="text-gray-700 hover:text-red-600 font-medium transition-colors duration-200 relative group px-2 py-1"
+              >
+                {item.label}
+                <span className="absolute -bottom-1 left-2 w-0 h-0.5 bg-red-600 group-hover:w-[calc(100%-1rem)] transition-all duration-200"></span>
+              </Link>
+            ))}
 
-            {/* Auth Section */}
             <div className="flex items-center space-x-3 ml-6 pl-6 border-l border-gray-200">
               {!isLoggedIn ? (
                 <>
-                  <Link
-                    to="/login"
-                    className="text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-lg hover:bg-gray-50 transition-all duration-200"
-                  >
+                  <Link to="/login" className="text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-lg hover:bg-gray-50">
                     Login
                   </Link>
-                  <Link
-                    to="/register"
-                    className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-                  >
+                  <Link to="/register" className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                     Sign Up
                   </Link>
                 </>
               ) : (
-                <div className="flex items-center space-x-3">
-                  {/* Show user type indicator */}
-                  <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded-md">
-                    {userType === 'host' ? '🏠 Host' : '👤 Guest'}
-                  </span>
-                  <Link
-                    to="/settings"
-                    className="text-gray-700 hover:text-red-600 font-medium px-3 py-2 rounded-lg hover:bg-gray-50 transition-all duration-200"
-                    title="Account Settings"
-                  >
+                <>
+                  <Link to="/settings" title="Account Settings" className="text-gray-700 hover:text-red-600 px-3 py-2 hover:bg-gray-50 rounded-lg">
                     ⚙️
                   </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 font-medium transition-all duration-200 shadow-md hover:shadow-lg"
-                  >
+                  <button onClick={handleLogout} className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 font-medium shadow-md hover:shadow-lg">
                     Logout
                   </button>
-                </div>
+                </>
               )}
             </div>
           </div>
 
-          {/* Mobile menu button */}
+          {/* Mobile Toggle */}
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 hover:text-red-600 focus:outline-none focus:text-red-600 transition-colors duration-200 p-2"
-              aria-label="Toggle mobile menu"
+              className="text-gray-700 hover:text-red-600 focus:outline-none transition-colors p-2"
+              aria-label="Toggle menu"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {isMenuOpen ? (
@@ -176,65 +158,46 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation Menu */}
+        {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-gray-100 shadow-lg">
-              {/* Mobile Navigation Links */}
-              {currentNavItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className="block px-3 py-3 text-gray-700 hover:text-red-600 hover:bg-gray-50 rounded-md font-medium transition-all duration-200"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <div className="flex flex-col">
-                    <span>{item.label}</span>
-                    <span className="text-xs text-gray-500 mt-1">{item.description}</span>
-                  </div>
-                </Link>
-              ))}
+          <div className="md:hidden px-2 pt-2 pb-3 bg-white border-t border-gray-100 shadow-lg space-y-1">
+            {currentNavItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={() => setIsMenuOpen(false)}
+                className="block px-3 py-3 text-gray-700 hover:text-red-600 hover:bg-gray-50 rounded-md font-medium"
+              >
+                <div className="flex flex-col">
+                  <span>{item.label}</span>
+                  <span className="text-xs text-gray-500 mt-1">{item.description}</span>
+                </div>
+              </Link>
+            ))}
 
-              {/* Mobile Auth Section */}
-              <div className="pt-3 mt-3 border-t border-gray-200">
-                {!isLoggedIn ? (
-                  <>
-                    <Link
-                      to="/login"
-                      className="block px-3 py-3 text-gray-700 hover:text-red-600 hover:bg-gray-50 rounded-md font-medium transition-all duration-200 mb-2"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Login
-                    </Link>
-                    <Link
-                      to="/register"
-                      className="block px-3 py-3 bg-red-600 text-white hover:bg-red-700 rounded-md font-medium transition-all duration-200 text-center"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Sign Up
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    <div className="px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-md mb-2">
-                      {userType === 'host' ? '🏠 Host Account' : '👤 Guest Account'}
-                    </div>
-                    <Link
-                      to="/settings"
-                      className="block px-3 py-3 text-gray-700 hover:text-red-600 hover:bg-gray-50 rounded-md font-medium transition-all duration-200"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      ⚙️ Settings
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-3 py-3 bg-gray-600 text-white hover:bg-gray-700 rounded-md font-medium transition-all duration-200 mt-2"
-                    >
-                      Logout
-                    </button>
-                  </>
-                )}
-              </div>
+            <div className="pt-3 mt-3 border-t border-gray-200">
+              {!isLoggedIn ? (
+                <>
+                  <Link to="/login" className="block px-3 py-3 hover:bg-gray-50 text-gray-700 hover:text-red-600 rounded-md font-medium" onClick={() => setIsMenuOpen(false)}>
+                    Login
+                  </Link>
+                  <Link to="/register" className="block px-3 py-3 bg-red-600 text-white hover:bg-red-700 rounded-md font-medium text-center" onClick={() => setIsMenuOpen(false)}>
+                    Sign Up
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <div className="px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-md mb-2">
+                    {userType === 'host' ? '🏠 Host Account' : '👤 Guest Account'}
+                  </div>
+                  <Link to="/settings" onClick={() => setIsMenuOpen(false)} className="block px-3 py-3 hover:bg-gray-50 text-gray-700 hover:text-red-600 rounded-md font-medium">
+                    ⚙️ Settings
+                  </Link>
+                  <button onClick={handleLogout} className="w-full text-left px-3 py-3 bg-gray-600 text-white hover:bg-gray-700 rounded-md font-medium mt-2">
+                    Logout
+                  </button>
+                </>
+              )}
             </div>
           </div>
         )}
