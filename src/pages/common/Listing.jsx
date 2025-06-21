@@ -2,9 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Heart, MapPin, Star, Wifi, Car, Coffee, Users, Search, X, List, ChevronDown, Sliders } from 'lucide-react';
 
 const Listing = ({ id, title, location, pricePerNight, originalPrice, imageUrl, rating, reviewCount, tag, maxGuests, amenities, availability = true, propertyType, onFavoriteClick, onBookClick, onViewOnMap, isMapView = false }) => {
-  useEffect(() => {
-      document.title = 'Listings • StayFinder';
-    }, []);
   const [isFavorited, setIsFavorited] = useState(false);
   const amenityIcons = { wifi: <Wifi size={14} />, parking: <Car size={14} />, breakfast: <Coffee size={14} /> };
   const tagColors = { 'Featured': 'bg-blue-600', 'New': 'bg-green-600', 'Popular': 'bg-purple-600', 'Discounted': 'bg-red-600' };
@@ -305,6 +302,10 @@ const EnhancedListingApp = () => {
   const [filters, setFilters] = useState({});
   const [showFilters, setShowFilters] = useState(false);
   const [selectedMapListing, setSelectedMapListing] = useState(null);
+
+  useEffect(() => {
+    document.title = 'Listings • StayFinder';
+  }, []);
 
   const generateListings = () => {
     const locations = ['Kasol, HP', 'Goa', 'Mumbai', 'Udaipur', 'Rishikesh', 'Bangalore', 'Delhi', 'Jaipur', 'Kerala', 'Shimla', 'Manali', 'Pune', 'Chennai', 'Kolkata', 'Agra', 'Varanasi', 'Mysore', 'Ooty', 'Darjeeling', 'Pushkar', 'Hampi', 'Alleppey', 'Coorg', 'Munnar'];
